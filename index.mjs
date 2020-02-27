@@ -1,6 +1,6 @@
 import WebSocket from 'ws'
 import { createServer } from 'http'
-import { rmdirSync as rm, chmodSync as chmod, mkdirSync as mkdir } from 'fs'
+import { unlinkSync as rm, chmodSync as chmod, mkdirSync as mkdir, readdirSync as ls } from 'fs'
 import { resolve } from 'path'
 import net from 'net'
 
@@ -8,8 +8,8 @@ const __filename = decodeURIComponent(new URL(import.meta.url).pathname);
 
 const sockDir = resolve(__filename, '..', 'sockets');
 
-try{ rm(sockDir, { recursive: true }) } catch(e){}
 try{ mkdir(sockDir) } catch(e){}
+try{ for(const file of ls(sockDir)) rm(`${sockDir}/${file}`) } catch(e){}
 
 for(const arg of process.argv.slice(2)){
     let [ hostport, name, mode ] = arg.split(',');
