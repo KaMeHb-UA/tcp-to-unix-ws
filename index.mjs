@@ -11,7 +11,11 @@ const sockDir = resolve(__filename, '..', 'sockets');
 try{ mkdir(sockDir) } catch(e){}
 try{ for(const file of ls(sockDir)) rm(`${sockDir}/${file}`) } catch(e){}
 
-for(const arg of process.argv.slice(2)){
+const args = process.argv.slice(2);
+const verbose = args[0] === '-v';
+if(verbose) args.shift();
+
+for(const arg of args){
     let [ hostport, name, mode ] = arg.split(',');
     let [ host, port ] = hostport.split(':');
     if(!host) host = '127.0.0.1';
@@ -24,5 +28,10 @@ for(const arg of process.argv.slice(2)){
     const ws = new WebSocket.Server({ server });
     const wsStream = WebSocket.createWebSocketStream(ws);
     const client = new net.Socket();
-    client.pipe(wsStream).pipe(client)
+    client.pipe(wsStream).pipe(client);
+    client.connect({ host, port });
+    if(verbose){
+        client.on('data', data => console.log('GOT:', data));
+        wsStream.on('data', data => console.log('SENT:', data));
+    }
 }
