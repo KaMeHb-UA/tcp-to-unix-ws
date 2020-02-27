@@ -1,0 +1,8 @@
+{
+    "scripts": {
+        "start": "node --experimental-modules index.mjs"
+    },
+    "dependencies": {
+        "ws": "^7.2.1"
+    }
+}
